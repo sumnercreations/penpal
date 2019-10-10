@@ -2,6 +2,9 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 
+from decoder import decode
+from encoder import encode
+
 class AppWindow(Gtk.Window):
 
     def __init__(self):
@@ -15,37 +18,74 @@ class AppWindow(Gtk.Window):
 
         self.set_titlebar(header)
 
-        scrolled = Gtk.ScrolledWindow()
-        scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-
         flowbox = Gtk.FlowBox()
         flowbox.set_valign(Gtk.Align.START)
         flowbox.set_max_children_per_line(30)
         flowbox.set_selection_mode(Gtk.SelectionMode.NONE)
 
-        self.message = Gtk.TextView()
-        self.set_default_size(-1, 350)
-        self.textbuffer = self.message.get_buffer()
-        self.textbuffer.set_text("Welcome to the PenPal Cipther App!")
-        self.message.set_editable(True)
+        # start decoder
+        self.message_to_decode = Gtk.TextView()
+        self.textbuffer = self.message_to_decode.get_buffer()
+        self.textbuffer.set_text("awecvgy Dlsjvtl av aol WluWhs Jpwoly Hww!")
+        self.message_to_decode.set_editable(True)
 
-        label = Gtk.Label()
-        label.set_text("Enter the message that you want to encode/decode.")
+        decode_label = Gtk.Label()
+        decode_label.set_text("Enter the message that you want to decode.")
 
-        button = Gtk.Button.new_with_label("Encode/Decode")
-        button.connect("clicked", self.on_encode_clicked)
-                
-        flowbox.add(label)
-        flowbox.add(self.message)
-        flowbox.add(button)
+        decode_button = Gtk.Button.new_with_label("Decode Message")
+        decode_button.connect("clicked", self.on_decode_clicked)
 
-        scrolled.add(flowbox)
+        self.decoded_label = Gtk.Label()
+        # /end decoder
 
-        self.add(scrolled)
+        # separator
+        separator = Gtk.Separator()
+
+        # start encoder
+        self.message_to_encode = Gtk.TextView()
+        self.textbuffer = self.message_to_encode.get_buffer()
+        self.textbuffer.set_text("Welcome to the PenPal Cipher App!")
+        self.message_to_encode.set_editable(True)
+
+        encode_label = Gtk.Label()
+        encode_label.set_text("Enter the message that you want to encode.")
+
+        encode_button = Gtk.Button.new_with_label("Encode Message")
+        encode_button.connect("clicked", self.on_encode_clicked)
+
+        self.encoded_label = Gtk.Label()
+        # /end encoder
+
+        flowbox.add(decode_label)
+        flowbox.add(self.message_to_decode)
+        flowbox.add(decode_button)
+        flowbox.add(self.decoded_label)
+        flowbox.add(separator)
+        flowbox.add(encode_label)
+        flowbox.add(self.message_to_encode)
+        flowbox.add(encode_button)
+        flowbox.add(self.encoded_label)
+
+        self.add(flowbox)
         self.show_all()
 
+    def on_decode_clicked(self, button):
+        buffer = self.message_to_decode.get_buffer()
+        (start, stop) = buffer.get_bounds()
+        message_to_decode = buffer.get_text(start, stop, 0)
+        decoded_message = decode(message_to_decode)
+
+        # display the decoded message
+        self.decoded_label.set_text(decoded_message)
+    
     def on_encode_clicked(self, button):
-        print("Encode button clicked. This is where we put the code April wrote")
+        buffer = self.message_to_encode.get_buffer()
+        (start, stop) = buffer.get_bounds()
+        message_to_encode = buffer.get_text(start, stop, 0)
+        encoded_message = encode(message_to_encode, 7)
+
+        # display the encoded message
+        self.encoded_label.set_text(encoded_message)
 
 win = AppWindow()
 win.connect("destroy", Gtk.main_quit)
