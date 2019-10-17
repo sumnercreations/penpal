@@ -24,8 +24,9 @@ class AppWindow(Gtk.Window):
         flowbox.set_max_children_per_line(30)
         flowbox.set_selection_mode(Gtk.SelectionMode.NONE)
 
-        # TODO: add input for the shift
-        # Gtk.Scale or Gtk.SpinButton?
+        shift_label = Gtk.Label()
+        shift_label.set_text("Choose the Shift")
+        self.shift_input = Gtk.SpinButton.new_with_range(1, 25, 1)
 
         # start decoder
         self.message_to_decode = Gtk.TextView()
@@ -72,6 +73,8 @@ class AppWindow(Gtk.Window):
         flowbox.add(separator)
         flowbox.add(encode_label)
         flowbox.add(self.message_to_encode)
+        flowbox.add(shift_label)
+        flowbox.add(self.shift_input)
         flowbox.add(encode_button)
         flowbox.add(self.encoded_label)
 
@@ -91,7 +94,7 @@ class AppWindow(Gtk.Window):
         buffer = self.message_to_encode.get_buffer()
         (start, stop) = buffer.get_bounds()
         message_to_encode = buffer.get_text(start, stop, 0)
-        encoded_message = encode(message_to_encode, 7)
+        encoded_message = encode(message_to_encode, self.shift_input.get_value_as_int())
 
         # display the encoded message
         self.encoded_label.set_text(encoded_message)
